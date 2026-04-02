@@ -46,8 +46,8 @@ function Get-CIPPAlertGlobalAdminAllowList {
             $UpnPrefix = ($admin.userPrincipalName -split '@')[0].ToLowerInvariant()
             if ($AllowedLookup -notcontains $UpnPrefix) {
                 [PSCustomObject]@{
-                    Admin      = $admin
-                    UpnPrefix  = $UpnPrefix
+                    Admin     = $admin
+                    UpnPrefix = $UpnPrefix
                 }
             }
         }
@@ -69,16 +69,16 @@ function Get-CIPPAlertGlobalAdminAllowList {
             } else {
                 $NonCompliantUpns = @($UnapprovedAdmins.Admin.userPrincipalName)
                 $AlertData = @([PSCustomObject]@{
-                        Message            = "Found $($NonCompliantUpns.Count) Global Administrator account(s) not in the approved allow list."
-                        NonCompliantUsers  = $NonCompliantUpns
-                        ApprovedPrefixes   = if ($AllowedAdmins) { $AllowedAdmins -join ', ' } else { 'Not provided' }
-                        Tenant             = $TenantFilter
+                        Message           = "Found $($NonCompliantUpns.Count) Global Administrator account(s) not in the approved allow list."
+                        NonCompliantUsers = $NonCompliantUpns -join ', '
+                        ApprovedPrefixes  = if ($AllowedAdmins) { $AllowedAdmins -join ', ' } else { 'Not provided' }
+                        Tenant            = $TenantFilter
                     })
             }
 
             Write-AlertTrace -cmdletName $MyInvocation.MyCommand -tenantFilter $TenantFilter -data $AlertData
         }
     } catch {
-        Write-AlertMessage -tenant $TenantFilter -message "Failed to check approved Global Admins: $(Get-NormalizedError -message $_.Exception.Message)"
+        Write-LogMessage -API 'Alerts' -tenant $TenantFilter -message "Failed to check approved Global Admins: $(Get-NormalizedError -message $_.Exception.Message)" -sev Error
     }
 }
